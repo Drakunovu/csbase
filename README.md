@@ -8,7 +8,7 @@ Guía en Español e Ingles
 Solamente sistemas operativos Linux, probado únicamente en Ubuntu pero debería de funcionar en CentOS y Debian igualmente.
 Only S.O Linux, tested only in Ubuntu, but it should be working on CentOS and Debian as same.
 
-///////////////////////// English \\\\\\\\\\\\\\\\\\\\\\\\\
+/////////// English \\\\\\\\\\\
 
 How to install it?
 
@@ -23,7 +23,7 @@ Go to the folder "cstrike" into the "CSBase2020-master" folder
 Edit with a text editor the files "server.cfg" and "game.cfg"
 These files comes in Spanish by default, change the hostname, rcon password and everything you want.
 
-Open a Screen with: "screen -S CSBase2020"
+Open a screen with: "screen -S CSBase2020"
 You can change the "CSBase2020" to a name you prefer onto the Screen
 Open the server with: "./hlds_run -game cstrike -ip 127.0.0.1 -port 27015 -pingboost 3"
 You can change as always the IP and the Port
@@ -35,7 +35,7 @@ Optional:
 Delete the file "master.zip"
 You can rename the folder "CSBase2020-master"
 
-///////////////////////// Spanish \\\\\\\\\\\\\\\\\\\\\\\\\
+/////////// Spanish \\\\\\\\\\\
 
 ¿Cómo instalarlo?
 
