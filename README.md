@@ -7,11 +7,17 @@ ADVERTENCIA: Si no usas Linux no uses esto, ya que es solo para Linux
 A medida que salgan nuevas versiones de ReHLDS y demás se ira actualizando.
 
 ReHLDS v3.7.0.694
+
 ReGameDLL v5.15.0.457
+
 ReAPI v5.12.0.192
+
 Reunion v0.1.0.133
+
 AMXX v1.8.2
+
 VoiceTranscoder v2017RC4
+
 SafeNameAndChat 1.1
 
 # ¿Cómo usar?
