@@ -1,22 +1,25 @@
 # CSBase2020
 Una base del juego Counter-Strike 1.6 actualizada a 2020
+
 ADVERTENCIA: Si no usas Linux no uses esto, ya que es solo para Linux
 
 # Contenidos
 
 A medida que salgan nuevas versiones de ReHLDS y demás se ira actualizando.
 
-ReHLDS v3.7.0.694
+ReHLDS v3.7.0.698
 
-ReGameDLL v5.15.0.457
+ReGameDLL v5.18.0.473
 
-ReAPI v5.12.0.192
+ReAPI v5.15.0.199
 
 Reunion v0.1.0.133
 
 AMXX v1.8.2
 
-VoiceTranscoder v2017RC4
+~~VoiceTranscoder v2017RC4~~
+
+Revoice 0.1.0.34
 
 SafeNameAndChat 1.1
 
