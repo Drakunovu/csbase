@@ -27,6 +27,32 @@ SafeNameAndChat 1.1
 
 Sencillo, basta con descargar el .zip o hacerle git clone al repositorio y por siguiente seguir las instrucciones:
 
-1) Entrar a la carpeta cstrike y modificar server.cfg a tu gusto.
-2) Instalar tus plugins o lo que sea que quieras
-3) Iniciar el servidor con el siguiente comando: "./hlds_run -game cstrike +ip 127.0.0.1 -port 27015 -pingboost 3", de esta manera se usa la IP especificada, el puerto especificado y con eso basta.
+1) Ejecutar el siguiente comando dependiendo si estás en Debian, Ubuntu o en otra distribución:
+
+## CentOS:
+
+> yum clean all
+
+> yum update -y
+
+> yum upgrade -y
+
+> yum install glibc.i686 libstdc++.i686 -y
+
+## Debian o Ubuntu
+
+> apt -y update
+
+> apt -y upgrade
+
+> apt -y install lib32gcc1
+
+RECOMENDABLE NO USAR EL USUARIO 'root' PARA EJECUTAR EL SERVIDOR.
+
+2) Entrar a la carpeta cstrike y modificar server.cfg y game.cfg a tu gusto.
+
+3) Instalar tus plugins o lo que sea que quieras
+
+4) Iniciar el servidor con el siguiente comando: "./hlds_run -game cstrike +ip 127.0.0.1 -port 27015 -pingboost 3", de esta manera se usa la IP especificada, el puerto especificado y con eso basta.
+
+### Este README.md será actualizado pronto, estará solamente los contenidos y lo demás en la Wiki.
