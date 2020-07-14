@@ -31,21 +31,21 @@ Sencillo, basta con descargar el .zip o hacerle git clone al repositorio y por s
 
 ## CentOS:
 
-> yum clean all
+yum clean all
 
-> yum update -y
+yum update -y
 
-> yum upgrade -y
+yum upgrade -y
 
-> yum install glibc.i686 libstdc++.i686 -y
+yum install glibc.i686 libstdc++.i686 -y
 
 ## Debian o Ubuntu
 
-> apt -y update
+apt -y update
 
-> apt -y upgrade
+apt -y upgrade
 
-> apt -y install lib32gcc1
+apt -y install lib32gcc1
 
 RECOMENDABLE NO USAR EL USUARIO 'root' PARA EJECUTAR EL SERVIDOR.
 
