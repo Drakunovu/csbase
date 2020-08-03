@@ -53,6 +53,8 @@ RECOMENDABLE NO USAR EL USUARIO 'root' PARA EJECUTAR EL SERVIDOR.
 
 3) Instalar tus plugins o lo que sea que quieras
 
-4) Iniciar el servidor con el siguiente comando: "./hlds_run -game cstrike +ip 127.0.0.1 -port 27015 -pingboost 3", de esta manera se usa la IP especificada, el puerto especificado y con eso basta.
+4) Iniciar el servidor con el siguiente comando: "./hlds_run -game cstrike -map de_dust2 -port 27015", de esta manera se usa la IP especificada, el puerto especificado y con eso basta.
+
+4.1) Cambiar variables necesarias, "-map" y "-port".
 
 ### Este README.md será actualizado pronto, estará solamente los contenidos y lo demás en la Wiki.
