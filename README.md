@@ -1,5 +1,5 @@
 # CSBase
-A Counter-Strike 1.6 server base to the standards in the 2023
+A Counter-Strike 1.6 server base to the standards in the 2024
 
 WARNING: Don't use this if you are going to use Windows, this is only for Linux.
 
