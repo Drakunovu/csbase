@@ -6,18 +6,20 @@ WARNING: Don't use this if you are going to use Windows, this is only for Linux.
 # Content
 This is the list of content that includes, modules, binaries, and more.
 
-- ReHLDS v3.13.0.788
+- ReHLDS - 1d6c682
 
-- ReGameDLL v5.22.0.254
+- ReGameDLL - 051dc07
 
-- Metamod-R v1.3.0.131
+- Metamod-R - v1.3.0.138
 
-- AMXX v1.9 - build 5294
+- AMXX v1.10 - build 5467
 
-- ReAPI v5.22.0.254
+- ReAPI - v5.22.0.254
 
-- Reunion v0.1.0.133
+- Reunion - v0.1.0.133
 
-- Revoice v0.1.0.33
+- Revoice - v0.1.0.33
 
 - SafeNameAndChat v1.1
+
+- ReAuthCheck - 0.1.6
