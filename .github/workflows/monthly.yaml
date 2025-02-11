@@ -1,0 +1,154 @@
+name: Nightly Builds Update
+
+on:
+  schedule:
+    - cron: '0 0 1 * *'
+  workflow_dispatch:
+
+jobs:
+  update_builds:
+    name: Update All Builds
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          path: main_repo
+
+      - name: ReHLDS
+        id: update_relds
+        run: |
+          cd main_repo
+          REHLDS_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReHLDS/actions/runs?branch=master&status=success&per_page=1&sort=created&direction=desc" | jq -r '.workflow_runs[0].head_sha')
+          echo "REHLDS_COMMIT_SHA=$REHLDS_COMMIT_SHA"
+          echo "::set-output name=sha::$REHLDS_COMMIT_SHA"
+          curl -LJO https://nightly.link/rehlds/ReHLDS/workflows/build/master/linux32.zip
+          git add bin/linux32/*
+          git diff-index --quiet HEAD || echo "::set-output name=relds_changed::true"
+          mkdir -p extracted_relds_files
+          unzip linux32.zip -d extracted_relds_files
+          SOURCE_DIR="extracted_relds_files/bin/linux32"
+          TARGET_DIR="bin/linux32"
+          mkdir -p "$TARGET_DIR"
+          rm -rf "$TARGET_DIR/*"
+          cp -r "$SOURCE_DIR"/* "$TARGET_DIR"
+          cd ..
+
+      - name: ReGameDLL
+        id: update_regamedll
+        run: |
+          cd main_repo
+          REGAMEDLL_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReGameDLL_CS/actions/runs?branch=master&status=success&per_page=1&sort=created&direction=desc" | jq -r '.workflow_runs[0].head_sha')
+          echo "REGAMEDLL_COMMIT_SHA=$REGAMEDLL_COMMIT_SHA"
+          echo "::set-output name=sha::$REGAMEDLL_COMMIT_SHA"
+          curl -LJO https://nightly.link/rehlds/ReGameDLL_CS/workflows/build/master/linux32.zip
+          git add bin/linux32/*
+          git diff-index --quiet HEAD || echo "::set-output name=regamedll_changed::true"
+          mkdir -p extracted_regamedll_files
+          unzip linux32.zip -d extracted_regamedll_files
+          SOURCE_DIR="extracted_regamedll_files/bin/linux32"
+          TARGET_DIR="bin/linux32"
+          mkdir -p "$TARGET_DIR"
+          rm -rf "$TARGET_DIR/*"
+          cp -r "$SOURCE_DIR"/* "$TARGET_DIR"
+          cd ..
+
+      - name: Metamod-R
+        id: update_metamodr
+        run: |
+          cd main_repo
+          METAMODR_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/Metamod-R/actions/runs?branch=master&status=success&per_page=1&sort=created&direction=desc" | jq -r '.workflow_runs[0].head_sha')
+          echo "METAMODR_COMMIT_SHA=$METAMODR_COMMIT_SHA"
+          echo "::set-output name=sha::$METAMODR_COMMIT_SHA"
+          curl -LJO https://nightly.link/rehlds/Metamod-R/workflows/build/master/linux32.zip
+          mkdir -p extracted_metamodr_files
+          unzip linux32.zip -d extracted_metamodr_files
+          SOURCE_FILE="extracted_metamodr_files/addons/metamod/metamod_i386.so"
+          TARGET_DIR="addons/metamod/dlls"
+          mkdir -p "$TARGET_DIR"
+          if [ -f "$SOURCE_FILE" ]; then
+            cp "$SOURCE_FILE" "$TARGET_DIR"
+          else
+            echo "Source file $SOURCE_FILE not found in Metamod-R extraction. Skipping Metamod-R update for this run."
+          fi
+          git add addons/metamod/dlls/*
+          git diff-index --quiet HEAD || echo "::set-output name=metamodr_changed::true"
+          cd ..
+
+      - name: ReAPI
+        id: update_reapi
+        run: |
+          cd main_repo
+          REAPI_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReAPI/actions/runs?branch=master&status=success&per_page=1&sort=created&direction=desc" | jq -r '.workflow_runs[0].head_sha')
+          echo "REAPI_COMMIT_SHA=$REAPI_COMMIT_SHA"
+          echo "::set-output name=sha::$REAPI_COMMIT_SHA"
+          curl -LJO https://nightly.link/rehlds/ReAPI/workflows/build/master/linux32.zip
+          mkdir -p extracted_reapi_files
+          unzip linux32.zip -d extracted_reapi_files
+          rm -rf extracted_reapi_files/addons/amxmodx/scripting
+          SOURCE_DIR="extracted_reapi_files/addons"
+          TARGET_DIR="cstrike/addons"
+          mkdir -p "$TARGET_DIR"
+          rm -rf "$TARGET_DIR/*"
+          cp -r "$SOURCE_DIR"/* "$TARGET_DIR"
+          git add cstrike/addons/*
+          git diff-index --quiet HEAD || echo "::set-output name=reapi_changed::true"
+          cd ..
+
+      - name: Check changes
+        id: check_changes
+        run: |
+          cd main_repo
+          git diff-index --quiet HEAD || echo "::set-output name=changed::true"
+
+      - name: Git config
+        run: |
+          cd main_repo
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>@users.noreply.github.com"
+
+      - name: Commit message
+        id: commit_message
+        run: |
+          REHLDS_UPDATED=$([ -n "${{ steps.update_relds.outputs.relds_changed }}" ] && echo "ReHLDS") || ""
+          REGAMEDLL_UPDATED=$([ -n "${{ steps.update_regamedll.outputs.regamedll_changed }}" ] && echo "ReGameDLL") || ""
+          METAMODR_UPDATED=$([ -n "${{ steps.update_metamodr.outputs.metamodr_changed }}" ] && echo "Metamod-R") || ""
+          REAPI_UPDATED=$([ -n "${{ steps.update_reapi.outputs.reapi_changed }}" ] && echo "ReAPI") || ""
+
+          REHLDS_COMMIT_SHA="${{ steps.update_relds.outputs.sha }}"
+          REGAMEDLL_COMMIT_SHA="${{ steps.update_regamedll.outputs.sha }}"
+          METAMODR_COMMIT_SHA="${{ steps.update_metamodr.outputs.sha }}"
+          REAPI_COMMIT_SHA="${{ steps.update_reapi.outputs.sha }}"
+
+          COMMIT_MESSAGE="Update binaries with latest monthly nightly builds:"
+
+          if [ -n "$REHLDS_UPDATED" ]; then
+            COMMIT_MESSAGE="$COMMIT_MESSAGE\n- ReHLDS: ${{ steps.update_relds.outputs.sha }}"
+          fi
+          if [ -n "$REGAMEDLL_UPDATED" ]; then
+            COMMIT_MESSAGE="$COMMIT_MESSAGE\n- ReGameDLL: ${{ steps.update_regamedll.outputs.sha }}"
+          fi
+          if [ -n "$METAMODR_UPDATED" ]; then
+            COMMIT_MESSAGE="$COMMIT_MESSAGE\n- Metamod-R: ${{ steps.update_metamodr.outputs.sha }}"
+          fi
+          if [ -n "$REAPI_UPDATED" ]; then
+            COMMIT_MESSAGE="$COMMIT_MESSAGE\n- ReAPI: ${{ steps.update_reapi.outputs.sha }}"
+          fi
+
+          if [ -z "$REHLDS_UPDATED" ] && [ -z "$REGAMEDLL_UPDATED" ] && [ -z "$METAMODR_UPDATED" ] && [ -z "$REAPI_UPDATED" ]; then
+            COMMIT_MESSAGE="No updates from ReHLDS, ReGameDLL, ReAPI, or Metamod-R monthly nightly builds"
+          fi
+
+          echo "COMMIT_MESSAGE=$COMMIT_MESSAGE"
+          echo "::set-output name=message::$COMMIT_MESSAGE"
+
+      - name: Commit push
+        if: steps.commit_message.outputs.message != 'No updates from ReHLDS, ReGameDLL, ReAPI, or Metamod-R monthly nightly builds'
+        run: |
+          cd main_repo
+          git add bin/linux32/*
+          git add cstrike/addons/*
+          git add addons/metamod/dlls/*
+          git diff-index --quiet HEAD || git commit -m "${{ steps.commit_message.outputs.message }}"
+          git push origin main
