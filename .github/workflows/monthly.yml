@@ -71,7 +71,7 @@ jobs:
           REAPI_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/Re-CS/reapi/actions/runs?branch=master&status=success&per_page=1&sort=created&direction=desc" | jq -r '.workflow_runs[0].head_sha')
           echo "REAPI_COMMIT_SHA=$REAPI_COMMIT_SHA"
           echo "sha=$REAPI_COMMIT_SHA" >> $GITHUB_OUTPUT
-          curl -LJO https://nightly.link/Re-CS/reapi/workflows/build/master/linux32.zip
+          curl -LJO https://nightly.link/rehlds/ReAPI/workflows/build/master/linux32.zip
           mkdir -p extracted_reapi_files
           unzip linux32.zip -d extracted_reapi_files
           TARGET_DIR="cstrike/addons/amxmodx/modules"
