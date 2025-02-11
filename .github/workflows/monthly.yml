@@ -15,7 +15,7 @@ jobs:
       - name: ReHLDS
         id: update_relds
         run: |
-          cd main_repo
+          cd csbase
           REHLDS_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReHLDS/actions/runs?branch=master&status=success&per_page=1&sort=created&direction=desc" | jq -r '.workflow_runs[0].head_sha')
           echo "REHLDS_COMMIT_SHA=$REHLDS_COMMIT_SHA"
           echo "::set-output name=sha::$REHLDS_COMMIT_SHA"
@@ -27,17 +27,17 @@ jobs:
           cp -r "$SOURCE_DIR"/* "$TARGET_DIR"
           git add bin/linux32/*
           git diff-index --quiet HEAD || echo "::set-output name=relds_changed::true"
-          rm -rf extracted_relds_files linux32.zip
+          rm -rf extracted_relds_files linux32.zip # Cleanup
           cd ..
 
       - name: ReGameDLL
         id: update_regamedll
         run: |
-          cd main_repo
+          cd csbase
           REGAMEDLL_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReGameDLL_CS/actions/runs?branch=master&status=success&per_page=1&sort=created&direction=desc" | jq -r '.workflow_runs[0].head_sha')
           echo "REGAMEDLL_COMMIT_SHA=$REGAMEDLL_COMMIT_SHA"
           echo "::set-output name=sha::$REGAMEDLL_COMMIT_SHA"
-          curl -LJO https://nightly.link/rehlds/ReGameDLL_CS/workflows/build/master/linux32.zip
+          curl -LJO https://nightly.link/rehlds/ReGameDLL_CS/workflows/build/master/regamedll_linux.zip
           mkdir -p extracted_regamedll_files
           unzip regamedll_linux.zip -d extracted_regamedll_files
           SOURCE_DIR="extracted_regamedll_files/bin/linux32"
@@ -45,17 +45,17 @@ jobs:
           cp -r "$SOURCE_DIR"/* "$TARGET_DIR"
           git add bin/linux32/*
           git diff-index --quiet HEAD || echo "::set-output name=regamedll_changed::true"
-          rm -rf extracted_regamedll_files linux32.zip
+          rm -rf extracted_regamedll_files regamedll_linux.zip # Cleanup
           cd ..
 
       - name: Metamod-R
         id: update_metamodr
         run: |
-          cd main_repo
+          cd csbase
           METAMODR_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/sven70/metamod-r/actions/runs?branch=master&status=success&per_page=1&sort=created&direction=desc" | jq -r '.workflow_runs[0].head_sha')
           echo "METAMODR_COMMIT_SHA=$METAMODR_COMMIT_SHA"
           echo "::set-output name=sha::$METAMODR_COMMIT_SHA"
-          curl -LJO https://nightly.link/rehlds/Metamod-R/workflows/build/master/linux32.zip
+          curl -LJO https://nightly.link/sven70/metamod-r/workflows/Build/master/metamod-r-linux.zip
           mkdir -p extracted_metamodr_files
           unzip metamod-r-linux.zip -d extracted_metamodr_files
           SOURCE_FILE="extracted_metamodr_files/addons/metamod/metamod_i386.so"
@@ -64,17 +64,17 @@ jobs:
           cp "$SOURCE_FILE" "$TARGET_DIR"
           git add addons/metamod/dlls/metamod_i386.so
           git diff-index --quiet HEAD || echo "::set-output name=metamodr_changed::true"
-          rm -rf extracted_metamodr_files linux32.zip
+          rm -rf extracted_metamodr_files metamod-r-linux.zip # Cleanup
           cd ..
 
       - name: ReAPI
         id: update_reapi
         run: |
-          cd main_repo
+          cd csbase
           REAPI_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/Re-CS/reapi/actions/runs?branch=master&status=success&per_page=1&sort=created&direction=desc" | jq -r '.workflow_runs[0].head_sha')
           echo "REAPI_COMMIT_SHA=$REAPI_COMMIT_SHA"
           echo "::set-output name=sha::$REAPI_COMMIT_SHA"
-          curl -LJO https://nightly.link/rehlds/ReAPI/workflows/build/master/linux32.zip
+          curl -LJO https://nightly.link/Re-CS/reapi/workflows/Build/master/reapi_linux.zip
           mkdir -p extracted_reapi_files
           unzip reapi_linux.zip -d extracted_reapi_files
           SOURCE_FILE="extracted_reapi_files/addons/amxmodx/modules/reapi_amxx_i386.so"
@@ -83,12 +83,12 @@ jobs:
           cp "$SOURCE_FILE" "$TARGET_DIR"
           git add addons/amxmodx/modules/reapi_amxx_i386.so
           git diff-index --quiet HEAD || echo "::set-output name=reapi_changed::true"
-          rm -rf extracted_reapi_files linux32.zip
+          rm -rf extracted_reapi_files reapi_linux.zip # Cleanup
           cd ..
 
       - name: Update main repository with new builds
         run: |
-          cd main_repo
+          cd csbase
           GIT_MESSAGE="Nightly builds update"
           if [[ "${{ steps.update_relds.outputs.relds_changed }}" == 'true' ]]; then
             GIT_MESSAGE="$GIT_MESSAGE\n- ReHLDS updated to commit SHA: ${{ steps.update_relds.outputs.sha }}"
