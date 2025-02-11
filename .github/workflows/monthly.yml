@@ -46,7 +46,7 @@ jobs:
           if ! git diff-index --quiet HEAD; then
             echo "regamedll_changed=true" >> $GITHUB_OUTPUT
           fi
-          rm -rf extracted_regamedll_files regamedll_linux.zip
+          rm -rf extracted_regamedll_files linux32.zip
 
       - name: Metamod-R
         id: update_metamodr
@@ -65,7 +65,7 @@ jobs:
           if ! git diff-index --quiet HEAD; then
             echo "metamodr_changed=true" >> $GITHUB_OUTPUT
           fi
-          rm -rf extracted_metamodr_files metamod-r-linux.zip
+          rm -rf extracted_metamodr_files linux32.zip
 
       - name: ReAPI
         id: update_reapi
@@ -84,7 +84,7 @@ jobs:
           if ! git diff-index --quiet HEAD; then
             echo "reapi_changed=true" >> $GITHUB_OUTPUT
           fi
-          rm -rf extracted_reapi_files reapi_linux.zip
+          rm -rf extracted_reapi_files linux32.zip
 
       - name: Update main repository with new builds
         run: |
