@@ -65,7 +65,7 @@ jobs:
           fi
           rm -rf extracted_metamodr_files linux32.zip
 
-        - name: ReAPI
+      - name: ReAPI
         id: update_reapi
         run: |
           REAPI_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/Re-CS/reapi/actions/runs?branch=master&status=success&per_page=1&sort=created&direction=desc" | jq -r '.workflow_runs[0].head_sha')
