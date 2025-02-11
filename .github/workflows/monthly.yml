@@ -19,10 +19,9 @@ jobs:
           echo "REHLDS_COMMIT_SHA=$REHLDS_COMMIT_SHA"
           echo "sha=$REHLDS_COMMIT_SHA" >> $GITHUB_OUTPUT
           curl -LJO https://nightly.link/rehlds/ReHLDS/workflows/build/master/linux32.zip
-          mkdir -p extracted_rehlds_files
           unzip linux32.zip -d extracted_rehlds_files
-          cp -r extracted_rehlds_files/bin/linux32/* ./
-          git add .
+          cp -rf extracted_rehlds_files/bin/linux32/* .
+          git add $(ls extracted_rehlds_files/bin/linux32 | xargs -I {} echo "{}")
           if ! git diff-index --quiet HEAD; then
             echo "rehlds_changed=true" >> $GITHUB_OUTPUT
           fi
