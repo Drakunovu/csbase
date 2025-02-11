@@ -33,6 +33,11 @@ jobs:
           mkdir -p "$TARGET_DIR"
           rm -rf "$TARGET_DIR/*"
           cp -r "$SOURCE_DIR"/* "$TARGET_DIR"
+          echo "--- Listing contents of bin directory ---"
+          ls -l bin
+          echo "--- Listing contents of bin/linux32 directory ---"
+          ls -l bin/linux32
+          echo "--- End of file listing ---"
           cd ..
 
       - name: ReGameDLL
