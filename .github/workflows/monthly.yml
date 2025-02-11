@@ -33,16 +33,17 @@ jobs:
       - name: ReGameDLL
         id: update_regamedll
         run: |
-          REGAMEDLL_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https:A=//api.github.com/repos/rehlds/ReGameDLL_CS/actions/runs?branch=master&status=success&per_page=1&sort=created&direction=desc" | jq -r '.workflow_runs[0].head_sha')
+          REGAMEDLL_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReGameDLL_CS/actions/runs?branch=master&status=success&per_page=1&sort=created&direction=desc" | jq -r '.workflow_runs[0].head_sha')
           echo "REGAMEDLL_COMMIT_SHA=$REGAMEDLL_COMMIT_SHA"
           echo "sha=$REGAMEDLL_COMMIT_SHA" >> $GITHUB_OUTPUT
           curl -LJO https://nightly.link/rehlds/ReGameDLL_CS/workflows/build/master/linux32.zip
           mkdir -p extracted_regamedll_files
           unzip linux32.zip -d extracted_regamedll_files
-          SOURCE_DIR="extracted_regamedll_files/bin/linux32"
-          TARGET_DIR="."
-          cp -r "$SOURCE_DIR"/* "$TARGET_DIR"
-          git add .
+          mkdir -p cstrike/dlls
+          cp extracted_regamedll_files/bin/linux32/cstrike/dlls/cs.so cstrike/dlls/
+          cp -r extracted_regamedll_files/dist/* cstrike/
+          git add cstrike/dlls/cs.so
+          git add cstrike/
           if ! git diff-index --quiet HEAD; then
             echo "regamedll_changed=true" >> $GITHUB_OUTPUT
           fi
