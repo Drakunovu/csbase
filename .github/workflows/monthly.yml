@@ -13,45 +13,47 @@ jobs:
         uses: actions/checkout@v4
 
       - name: ReHLDS
-        id: update_relds
+        id: update_rehlds
         run: |
           REHLDS_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReHLDS/actions/runs?branch=master&status=success&per_page=1&sort=created&direction=desc" | jq -r '.workflow_runs[0].head_sha')
           echo "REHLDS_COMMIT_SHA=$REHLDS_COMMIT_SHA"
-          echo "::set-output name=sha::$REHLDS_COMMIT_SHA"
+          echo "sha=$REHLDS_COMMIT_SHA" >> $GITHUB_OUTPUT
           curl -LJO https://nightly.link/rehlds/ReHLDS/workflows/build/master/linux32.zip
-          mkdir -p extracted_relds_files
-          unzip linux32.zip -d extracted_relds_files
-          SOURCE_DIR="extracted_relds_files/bin/linux32"
+          mkdir -p extracted_rehlds_files
+          unzip linux32.zip -d extracted_rehlds_files
+          SOURCE_DIR="extracted_rehlds_files/bin/linux32"
           TARGET_DIR="."
           cp -r "$SOURCE_DIR"/* "$TARGET_DIR"
-          git add bin/linux32/*
-          git diff-index --quiet HEAD || echo "::set-output name=relds_changed::true"
-          rm -rf extracted_relds_files linux32.zip # Cleanup
-          cd ..
+          git add .
+          if ! git diff-index --quiet HEAD; then
+            echo "rehlds_changed=true" >> $GITHUB_OUTPUT
+          fi
+          rm -rf extracted_rehlds_files linux32.zip
 
       - name: ReGameDLL
         id: update_regamedll
         run: |
-          REGAMEDLL_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReGameDLL_CS/actions/runs?branch=master&status=success&per_page=1&sort=created&direction=desc" | jq -r '.workflow_runs[0].head_sha')
+          REGAMEDLL_COMMIT_SH$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https:A=//api.github.com/repos/rehlds/ReGameDLL_CS/actions/runs?branch=master&status=success&per_page=1&sort=created&direction=desc" | jq -r '.workflow_runs[0].head_sha')
           echo "REGAMEDLL_COMMIT_SHA=$REGAMEDLL_COMMIT_SHA"
-          echo "::set-output name=sha::$REGAMEDLL_COMMIT_SHA"
+          echo "sha=$REGAMEDLL_COMMIT_SHA" >> $GITHUB_OUTPUT
           curl -LJO https://nightly.link/rehlds/ReGameDLL_CS/workflows/build/master/regamedll_linux.zip
           mkdir -p extracted_regamedll_files
           unzip regamedll_linux.zip -d extracted_regamedll_files
           SOURCE_DIR="extracted_regamedll_files/bin/linux32"
           TARGET_DIR="."
           cp -r "$SOURCE_DIR"/* "$TARGET_DIR"
-          git add bin/linux32/*
-          git diff-index --quiet HEAD || echo "::set-output name=regamedll_changed::true"
-          rm -rf extracted_regamedll_files regamedll_linux.zip # Cleanup
-          cd ..
+          git add .
+          if ! git diff-index --quiet HEAD; then
+            echo "regamedll_changed=true" >> $GITHUB_OUTPUT
+          fi
+          rm -rf extracted_regamedll_files regamedll_linux.zip
 
       - name: Metamod-R
         id: update_metamodr
         run: |
-          METAMODR_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/sven70/metamod-r/actions/runs?branch=master&status=success&per_page=1&sort=created&direction=desc" | jq -r '.workflow_runs[0].head_sha')
+          METAMODR_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/Metamod-R/actions/runs?branch=master&status=success&per_page=1&sort=created&direction=desc" | jq -r '.workflow_runs[0].head_sha')
           echo "METAMODR_COMMIT_SHA=$METAMODR_COMMIT_SHA"
-          echo "::set-output name=sha::$METAMODR_COMMIT_SHA"
+          echo "sha=$METAMODR_COMMIT_SHA" >> $GITHUB_OUTPUT
           curl -LJO https://nightly.link/sven70/metamod-r/workflows/Build/master/metamod-r-linux.zip
           mkdir -p extracted_metamodr_files
           unzip metamod-r-linux.zip -d extracted_metamodr_files
@@ -60,16 +62,17 @@ jobs:
           mkdir -p "$TARGET_DIR"
           cp "$SOURCE_FILE" "$TARGET_DIR"
           git add addons/metamod/dlls/metamod_i386.so
-          git diff-index --quiet HEAD || echo "::set-output name=metamodr_changed::true"
-          rm -rf extracted_metamodr_files metamod-r-linux.zip # Cleanup
-          cd ..
+          if ! git diff-index --quiet HEAD; then
+            echo "metamodr_changed=true" >> $GITHUB_OUTPUT
+          fi
+          rm -rf extracted_metamodr_files metamod-r-linux.zip
 
       - name: ReAPI
         id: update_reapi
         run: |
-          REAPI_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/Re-CS/reapi/actions/runs?branch=master&status=success&per_page=1&sort=created&direction=desc" | jq -r '.workflow_runs[0].head_sha')
+          REAPI_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReAPI/actions/runs?branch=master&status=success&per_page=1&sort=created&direction=desc" | jq -r '.workflow_runs[0].head_sha')
           echo "REAPI_COMMIT_SHA=$REAPI_COMMIT_SHA"
-          echo "::set-output name=sha::$REAPI_COMMIT_SHA"
+          echo "sha=$REAPI_COMMIT_SHA" >> $GITHUB_OUTPUT
           curl -LJO https://nightly.link/Re-CS/reapi/workflows/Build/master/reapi_linux.zip
           mkdir -p extracted_reapi_files
           unzip reapi_linux.zip -d extracted_reapi_files
@@ -78,15 +81,16 @@ jobs:
           mkdir -p "$TARGET_DIR"
           cp "$SOURCE_FILE" "$TARGET_DIR"
           git add addons/amxmodx/modules/reapi_amxx_i386.so
-          git diff-index --quiet HEAD || echo "::set-output name=reapi_changed::true"
-          rm -rf extracted_reapi_files reapi_linux.zip # Cleanup
-          cd ..
+          if ! git diff-index --quiet HEAD; then
+            echo "reapi_changed=true" >> $GITHUB_OUTPUT
+          fi
+          rm -rf extracted_reapi_files reapi_linux.zip
 
       - name: Update main repository with new builds
         run: |
           GIT_MESSAGE="Nightly builds update"
-          if [[ "${{ steps.update_relds.outputs.relds_changed }}" == 'true' ]]; then
-            GIT_MESSAGE="$GIT_MESSAGE\n- ReHLDS updated to commit SHA: ${{ steps.update_relds.outputs.sha }}"
+          if [[ "${{ steps.update_rehlds.outputs.rehlds_changed }}" == 'true' ]]; then
+            GIT_MESSAGE="$GIT_MESSAGE\n- ReHLDS updated to commit SHA: ${{ steps.update_rehlds.outputs.sha }}"
           fi
           if [[ "${{ steps.update_regamedll.outputs.regamedll_changed }}" == 'true' ]]; then
             GIT_MESSAGE="$GIT_MESSAGE\n- ReGameDLL updated to commit SHA: ${{ steps.update_regamedll.outputs.sha }}"
@@ -99,6 +103,5 @@ jobs:
           fi
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions Bot"
-          git commit -am "$GIT_MESSAGE"
+          git commit -m "$(echo -e "$GIT_MESSAGE")"
           git push
-          cd ..
