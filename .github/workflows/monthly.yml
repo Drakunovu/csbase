@@ -15,10 +15,11 @@ jobs:
       - name: ReHLDS
         id: update_rehlds
         run: |
-          REHLDS_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReHLDS/actions/runs?branch=master&status=success&per_page=1&sort=created&direction=desc" | jq -r '.workflow_runs[0].head_sha')
-          echo "REHLDS_COMMIT_SHA=$REHLDS_COMMIT_SHA"
+          LATEST_RUN_ID=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReHLDS/actions/runs?branch=master&status=success&per_page=1" | jq -r '.workflow_runs[0].id')
+          ARTIFACT_ID=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReHLDS/actions/runs/${LATEST_RUN_ID}/artifacts" | jq -r '.artifacts[] | select(.name=="linux32").id')
+          REHLDS_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReHLDS/actions/runs/${LATEST_RUN_ID}" | jq -r '.head_sha')
           echo "sha=$REHLDS_COMMIT_SHA" >> $GITHUB_OUTPUT
-          curl -LJO https://nightly.link/rehlds/ReHLDS/workflows/build/master/linux32.zip
+          curl -s -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -o linux32.zip "https://api.github.com/repos/rehlds/ReHLDS/actions/artifacts/${ARTIFACT_ID}/zip"
           unzip linux32.zip -d extracted_rehlds_files
           cp -rf extracted_rehlds_files/bin/linux32/* .
           git add $(ls extracted_rehlds_files/bin/linux32 | xargs -I {} echo "{}")
@@ -30,10 +31,11 @@ jobs:
       - name: ReGameDLL
         id: update_regamedll
         run: |
-          REGAMEDLL_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReGameDLL_CS/actions/runs?branch=master&status=success&per_page=1&sort=created&direction=desc" | jq -r '.workflow_runs[0].head_sha')
-          echo "REGAMEDLL_COMMIT_SHA=$REGAMEDLL_COMMIT_SHA"
+          LATEST_RUN_ID=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReGameDLL_CS/actions/runs?branch=master&status=success&per_page=1" | jq -r '.workflow_runs[0].id')
+          ARTIFACT_ID=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReGameDLL_CS/actions/runs/${LATEST_RUN_ID}/artifacts" | jq -r '.artifacts[] | select(.name=="linux32").id')
+          REGAMEDLL_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReGameDLL_CS/actions/runs/${LATEST_RUN_ID}" | jq -r '.head_sha')
           echo "sha=$REGAMEDLL_COMMIT_SHA" >> $GITHUB_OUTPUT
-          curl -LJO https://nightly.link/rehlds/ReGameDLL_CS/workflows/build/master/linux32.zip
+          curl -s -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -o linux32.zip "https://api.github.com/repos/rehlds/ReGameDLL_CS/actions/artifacts/${ARTIFACT_ID}/zip"
           mkdir -p extracted_regamedll_files
           unzip linux32.zip -d extracted_regamedll_files
           mkdir -p cstrike/dlls
@@ -49,10 +51,11 @@ jobs:
       - name: Metamod-R
         id: update_metamodr
         run: |
-          METAMODR_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/Metamod-R/actions/runs?branch=master&status=success&per_page=1&sort=created&direction=desc" | jq -r '.workflow_runs[0].head_sha')
-          echo "METAMODR_COMMIT_SHA=$METAMODR_COMMIT_SHA"
+          LATEST_RUN_ID=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/Metamod-R/actions/runs?branch=master&status=success&per_page=1" | jq -r '.workflow_runs[0].id')
+          ARTIFACT_ID=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/Metamod-R/actions/runs/${LATEST_RUN_ID}/artifacts" | jq -r '.artifacts[] | select(.name=="linux32").id')
+          METAMODR_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/Metamod-R/actions/runs/${LATEST_RUN_ID}" | jq -r '.head_sha')
           echo "sha=$METAMODR_COMMIT_SHA" >> $GITHUB_OUTPUT
-          curl -LJO https://nightly.link/rehlds/Metamod-R/workflows/build/master/linux32.zip
+          curl -s -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -o linux32.zip "https://api.github.com/repos/rehlds/Metamod-R/actions/artifacts/${ARTIFACT_ID}/zip"
           mkdir -p extracted_metamodr_files
           unzip linux32.zip -d extracted_metamodr_files
           TARGET_DIR="cstrike/addons/metamod/dlls"
@@ -67,10 +70,11 @@ jobs:
       - name: ReAPI
         id: update_reapi
         run: |
-          REAPI_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReAPI/actions/runs?branch=master&status=success&per_page=1&sort=created&direction=desc" | jq -r '.workflow_runs[0].head_sha')
-          echo "REAPI_COMMIT_SHA=$REAPI_COMMIT_SHA"
+          LATEST_RUN_ID=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReAPI/actions/runs?branch=master&status=success&per_page=1" | jq -r '.workflow_runs[0].id')
+          ARTIFACT_ID=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReAPI/actions/runs/${LATEST_RUN_ID}/artifacts" | jq -r '.artifacts[] | select(.name=="linux32").id')
+          REAPI_COMMIT_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReAPI/actions/runs/${LATEST_RUN_ID}" | jq -r '.head_sha')
           echo "sha=$REAPI_COMMIT_SHA" >> $GITHUB_OUTPUT
-          curl -LJO https://nightly.link/rehlds/ReAPI/workflows/build/master/linux32.zip
+          curl -s -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -o linux32.zip "https://api.github.com/repos/rehlds/ReAPI/actions/artifacts/${ARTIFACT_ID}/zip"
           mkdir -p extracted_reapi_files
           unzip linux32.zip -d extracted_reapi_files
           TARGET_DIR="cstrike/addons/amxmodx/modules"
