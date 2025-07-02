@@ -17,7 +17,10 @@ jobs:
         run: |
           set -e
           echo "Fetching latest successful run for ReHLDS..."
-          LATEST_RUN_INFO=$(curl --fail -s -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReHLDS/actions/runs?branch=master&status=success&per_page=1")
+          LATEST_RUN_INFO=$(curl --fail -s -L \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/rehlds/ReHLDS/actions/runs?branch=master&status=success&per_page=1")
           LATEST_RUN_ID=$(echo "$LATEST_RUN_INFO" | jq -r '.workflow_runs[0].id')
           REHLDS_COMMIT_SHA=$(echo "$LATEST_RUN_INFO" | jq -r '.workflow_runs[0].head_sha')
           if [ -z "$LATEST_RUN_ID" ] || [ "$LATEST_RUN_ID" == "null" ]; then
@@ -25,27 +28,43 @@ jobs:
             exit 1
           fi
           echo "sha=$REHLDS_COMMIT_SHA" >> $GITHUB_OUTPUT
-          ARTIFACT_ID=$(curl --fail -s -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReHLDS/actions/runs/${LATEST_RUN_ID}/artifacts" | jq -r '.artifacts[] | select(.name=="linux32").id')
-          if [ -z "$ARTIFACT_ID" ] || [ "$ARTIFACT_ID" == "null" ]; then
-            echo "Error: Could not find artifact ID for 'linux32' in run ${LATEST_RUN_ID}."
+          ARTIFACTS_JSON=$(curl --fail -s -L \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/rehlds/ReHLDS/actions/runs/${LATEST_RUN_ID}/artifacts")
+          ARTIFACT_URL=$(echo "$ARTIFACTS_JSON" | jq -r '.artifacts[] | select(.name=="linux32").archive_download_url')
+          if [ -z "$ARTIFACT_URL" ] || [ "$ARTIFACT_URL" == "null" ]; then
+            echo "Error: Could not find 'linux32' artifact archive_download_url in run ${LATEST_RUN_ID}."
+            echo "$ARTIFACTS_JSON"
             exit 1
           fi
-          echo "Downloading artifact ${ARTIFACT_ID}..."
-          curl --fail -s -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -o linux32.zip "https://api.github.com/repos/rehlds/ReHLDS/actions/artifacts/${ARTIFACT_ID}/zip"
-          unzip linux32.zip -d extracted_rehlds_files
+          echo "Downloading artifact..."
+          curl --fail -s -L \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -o linux32_rehlds.zip \
+            "$ARTIFACT_URL"
+          if [ ! -f linux32_rehlds.zip ]; then
+            echo "Error: linux32_rehlds.zip was not downloaded successfully."
+            exit 1
+          fi
+          unzip linux32_rehlds.zip -d extracted_rehlds_files
           cp -rf extracted_rehlds_files/bin/linux32/* .
           git add $(ls extracted_rehlds_files/bin/linux32 | xargs -I {} echo "{}")
           if ! git diff-index --quiet HEAD; then
             echo "rehlds_changed=true" >> $GITHUB_OUTPUT
           fi
-          rm -rf extracted_rehlds_files linux32.zip
+          rm -rf extracted_rehlds_files linux32_rehlds.zip
 
       - name: ReGameDLL
         id: update_regamedll
         run: |
           set -e
           echo "Fetching latest successful run for ReGameDLL_CS..."
-          LATEST_RUN_INFO=$(curl --fail -s -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReGameDLL_CS/actions/runs?branch=master&status=success&per_page=1")
+          LATEST_RUN_INFO=$(curl --fail -s -L \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/rehlds/ReGameDLL_CS/actions/runs?branch=master&status=success&per_page=1")
           LATEST_RUN_ID=$(echo "$LATEST_RUN_INFO" | jq -r '.workflow_runs[0].id')
           REGAMEDLL_COMMIT_SHA=$(echo "$LATEST_RUN_INFO" | jq -r '.workflow_runs[0].head_sha')
           if [ -z "$LATEST_RUN_ID" ] || [ "$LATEST_RUN_ID" == "null" ]; then
@@ -53,15 +72,28 @@ jobs:
             exit 1
           fi
           echo "sha=$REGAMEDLL_COMMIT_SHA" >> $GITHUB_OUTPUT
-          ARTIFACT_ID=$(curl --fail -s -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReGameDLL_CS/actions/runs/${LATEST_RUN_ID}/artifacts" | jq -r '.artifacts[] | select(.name=="linux32").id')
-          if [ -z "$ARTIFACT_ID" ] || [ "$ARTIFACT_ID" == "null" ]; then
-            echo "Error: Could not find artifact ID for 'linux32' in run ${LATEST_RUN_ID}."
+          ARTIFACTS_JSON=$(curl --fail -s -L \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/rehlds/ReGameDLL_CS/actions/runs/${LATEST_RUN_ID}/artifacts")
+          ARTIFACT_URL=$(echo "$ARTIFACTS_JSON" | jq -r '.artifacts[] | select(.name=="linux32").archive_download_url')
+          if [ -z "$ARTIFACT_URL" ] || [ "$ARTIFACT_URL" == "null" ]; then
+            echo "Error: Could not find 'linux32' artifact archive_download_url in run ${LATEST_RUN_ID}."
+            echo "$ARTIFACTS_JSON"
             exit 1
           fi
-          echo "Downloading artifact ${ARTIFACT_ID}..."
-          curl --fail -s -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -o linux32.zip "https://api.github.com/repos/rehlds/ReGameDLL_CS/actions/artifacts/${ARTIFACT_ID}/zip"
+          echo "Downloading artifact..."
+          curl --fail -s -L \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -o linux32_regamedll.zip \
+            "$ARTIFACT_URL"
+          if [ ! -f linux32_regamedll.zip ]; then
+            echo "Error: linux32_regamedll.zip was not downloaded successfully."
+            exit 1
+          fi
           mkdir -p extracted_regamedll_files
-          unzip linux32.zip -d extracted_regamedll_files
+          unzip linux32_regamedll.zip -d extracted_regamedll_files
           mkdir -p cstrike/dlls
           cp extracted_regamedll_files/bin/linux32/cstrike/dlls/cs.so cstrike/dlls/
           cp -r extracted_regamedll_files/dist/* cstrike/
@@ -70,45 +102,17 @@ jobs:
           if ! git diff-index --quiet HEAD; then
             echo "regamedll_changed=true" >> $GITHUB_OUTPUT
           fi
-          rm -rf extracted_regamedll_files linux32.zip
-
-      - name: Metamod-R
-        id: update_metamodr
-        run: |
-          set -e
-          echo "Fetching latest successful run for Metamod-R..."
-          LATEST_RUN_INFO=$(curl --fail -s -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/Metamod-R/actions/runs?branch=master&status=success&per_page=1")
-          LATEST_RUN_ID=$(echo "$LATEST_RUN_INFO" | jq -r '.workflow_runs[0].id')
-          METAMODR_COMMIT_SHA=$(echo "$LATEST_RUN_INFO" | jq -r '.workflow_runs[0].head_sha')
-          if [ -z "$LATEST_RUN_ID" ] || [ "$LATEST_RUN_ID" == "null" ]; then
-            echo "Error: Could not find the latest successful workflow run for Metamod-R."
-            exit 1
-          fi
-          echo "sha=$METAMODR_COMMIT_SHA" >> $GITHUB_OUTPUT
-          ARTIFACT_ID=$(curl --fail -s -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/Metamod-R/actions/runs/${LATEST_RUN_ID}/artifacts" | jq -r '.artifacts[] | select(.name=="linux32").id')
-          if [ -z "$ARTIFACT_ID" ] || [ "$ARTIFACT_ID" == "null" ]; then
-            echo "Error: Could not find artifact ID for 'linux32' in run ${LATEST_RUN_ID}."
-            exit 1
-          fi
-          echo "Downloading artifact ${ARTIFACT_ID}..."
-          curl --fail -s -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -o linux32.zip "https://api.github.com/repos/rehlds/Metamod-R/actions/artifacts/${ARTIFACT_ID}/zip"
-          mkdir -p extracted_metamodr_files
-          unzip linux32.zip -d extracted_metamodr_files
-          TARGET_DIR="cstrike/addons/metamod/dlls"
-          mkdir -p "$TARGET_DIR"
-          cp extracted_metamodr_files/addons/metamod/metamod_i386.so "$TARGET_DIR"
-          git add cstrike/addons/metamod/dlls/metamod_i386.so
-          if ! git diff-index --quiet HEAD; then
-            echo "metamodr_changed=true" >> $GITHUB_OUTPUT
-          fi
-          rm -rf extracted_metamodr_files linux32.zip
+          rm -rf extracted_regamedll_files linux32_regamedll.zip
 
       - name: ReAPI
         id: update_reapi
         run: |
           set -e
           echo "Fetching latest successful run for ReAPI..."
-          LATEST_RUN_INFO=$(curl --fail -s -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReAPI/actions/runs?branch=master&status=success&per_page=1")
+          LATEST_RUN_INFO=$(curl --fail -s -L \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/rehlds/ReAPI/actions/runs?branch=master&status=success&per_page=1")
           LATEST_RUN_ID=$(echo "$LATEST_RUN_INFO" | jq -r '.workflow_runs[0].id')
           REAPI_COMMIT_SHA=$(echo "$LATEST_RUN_INFO" | jq -r '.workflow_runs[0].head_sha')
           if [ -z "$LATEST_RUN_ID" ] || [ "$LATEST_RUN_ID" == "null" ]; then
@@ -116,15 +120,28 @@ jobs:
             exit 1
           fi
           echo "sha=$REAPI_COMMIT_SHA" >> $GITHUB_OUTPUT
-          ARTIFACT_ID=$(curl --fail -s -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/rehlds/ReAPI/actions/runs/${LATEST_RUN_ID}/artifacts" | jq -r '.artifacts[] | select(.name=="linux32").id')
-          if [ -z "$ARTIFACT_ID" ] || [ "$ARTIFACT_ID" == "null" ]; then
-            echo "Error: Could not find artifact ID for 'linux32' in run ${LATEST_RUN_ID}."
+          ARTIFACTS_JSON=$(curl --fail -s -L \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/rehlds/ReAPI/actions/runs/${LATEST_RUN_ID}/artifacts")
+          ARTIFACT_URL=$(echo "$ARTIFACTS_JSON" | jq -r '.artifacts[] | select(.name=="linux32").archive_download_url')
+          if [ -z "$ARTIFACT_URL" ] || [ "$ARTIFACT_URL" == "null" ]; then
+            echo "Error: Could not find 'linux32' artifact archive_download_url in run ${LATEST_RUN_ID}."
+            echo "$ARTIFACTS_JSON"
             exit 1
           fi
-          echo "Downloading artifact ${ARTIFACT_ID}..."
-          curl --fail -s -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -o linux32.zip "https://api.github.com/repos/rehlds/ReAPI/actions/artifacts/${ARTIFACT_ID}/zip"
+          echo "Downloading artifact..."
+          curl --fail -s -L \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -o linux32_reapi.zip \
+            "$ARTIFACT_URL"
+          if [ ! -f linux32_reapi.zip ]; then
+            echo "Error: linux32_reapi.zip was not downloaded successfully."
+            exit 1
+          fi
           mkdir -p extracted_reapi_files
-          unzip linux32.zip -d extracted_reapi_files
+          unzip linux32_reapi.zip -d extracted_reapi_files
           TARGET_DIR="cstrike/addons/amxmodx/modules"
           mkdir -p "$TARGET_DIR"
           cp extracted_reapi_files/addons/amxmodx/modules/reapi_amxx_i386.so "$TARGET_DIR"
@@ -132,7 +149,7 @@ jobs:
           if ! git diff-index --quiet HEAD; then
             echo "reapi_changed=true" >> $GITHUB_OUTPUT
           fi
-          rm -rf extracted_reapi_files linux32.zip
+          rm -rf extracted_reapi_files linux32_reapi.zip
 
       - name: Update main repository with new builds
         run: |
@@ -142,9 +159,6 @@ jobs:
           fi
           if [[ "${{ steps.update_regamedll.outputs.regamedll_changed }}" == 'true' ]]; then
             GIT_MESSAGE="$GIT_MESSAGE\n- ReGameDLL updated to commit SHA: ${{ steps.update_regamedll.outputs.sha }}"
-          fi
-          if [[ "${{ steps.update_metamodr.outputs.metamodr_changed }}" == 'true' ]]; then
-            GIT_MESSAGE="$GIT_MESSAGE\n- Metamod-R updated to commit SHA: ${{ steps.update_metamodr.outputs.sha }}"
           fi
           if [[ "${{ steps.update_reapi.outputs.reapi_changed }}" == 'true' ]]; then
             GIT_MESSAGE="$GIT_MESSAGE\n- ReAPI updated to commit SHA: ${{ steps.update_reapi.outputs.sha }}"
