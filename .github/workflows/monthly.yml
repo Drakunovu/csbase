@@ -151,6 +151,30 @@ jobs:
           fi
           rm -rf extracted_reapi_files linux32_reapi.zip
 
+      - name: Update README versions
+        run: |
+          update_readme() {
+            local name=$1
+            local sha=$2
+            local short_sha=$(echo $sha | cut -c 1-7)
+            echo "Updating $name to $short_sha in README.md"
+            sed -i -E "s/(\| *${name} *\| *)[^|]*( *\|)/\1${short_sha}\2/" README.md
+          }
+
+          if [[ "${{ steps.update_rehlds.outputs.rehlds_changed }}" == 'true' ]]; then
+            update_readme "ReHLDS" "${{ steps.update_rehlds.outputs.sha }}"
+          fi
+
+          if [[ "${{ steps.update_regamedll.outputs.regamedll_changed }}" == 'true' ]]; then
+            update_readme "ReGameDLL" "${{ steps.update_regamedll.outputs.sha }}"
+          fi
+
+          if [[ "${{ steps.update_reapi.outputs.reapi_changed }}" == 'true' ]]; then
+            update_readme "ReAPI" "${{ steps.update_reapi.outputs.sha }}"
+          fi
+
+          git add README.md
+
       - name: Update main repository with new builds
         run: |
           GIT_MESSAGE="Nightly builds update"
