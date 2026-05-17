@@ -59,11 +59,11 @@ This base includes the following pre-installed modules and binaries:
 
 |    Module   |   Version  | Description |
 |:-----------:|:----------:|:------------|
-|    ReHLDS   |   1d130b2| Reverse-engineered HLDS engine |
-|  ReGameDLL  |   1540e26| Fixed and improved CS game logic |
+|    ReHLDS   |   1963001| Reverse-engineered HLDS engine |
+|  ReGameDLL  |   781a68a| Fixed and improved CS game logic |
 |  Metamod-R  | v1.3.0.149 | Metamod optimized for ReHLDS |
 |  AMXX v1.10 | build 5467 | Scripting platform for plugins |
-|    ReAPI    |   1d18ddb| API for advanced AMXX interaction |
+|    ReAPI    |   c4d28eb| API for advanced AMXX interaction |
 |   Reunion   |  v0.2.0.13 | Protocol manager (Non-Steam support) |
 |   Revoice   |  v0.1.0.34 | Voice chat fix for newer clients |
 | ReAuthCheck |   v0.1.6   | Security module (Anti-Fake/Proxy) |
