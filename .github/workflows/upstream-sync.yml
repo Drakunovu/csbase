@@ -20,22 +20,37 @@ jobs:
           LATEST_RUN_INFO=$(curl --fail -s -L \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/rehlds/ReHLDS/actions/runs?branch=master&status=success&per_page=1")
-          LATEST_RUN_ID=$(echo "$LATEST_RUN_INFO" | jq -r '.workflow_runs[0].id')
-          REHLDS_COMMIT_SHA=$(echo "$LATEST_RUN_INFO" | jq -r '.workflow_runs[0].head_sha')
+            "https://api.github.com/repos/rehlds/ReHLDS/actions/runs?branch=master&status=success&per_page=20")
+          LATEST_RUN_ID=""
+          REHLDS_COMMIT_SHA=""
+          ARTIFACT_URL=""
+          while IFS= read -r run; do
+            RUN_ID=$(echo "$run" | jq -r '.id')
+            RUN_NAME=$(echo "$run" | jq -r '.name')
+            RUN_SHA=$(echo "$run" | jq -r '.head_sha')
+            if [ "$RUN_NAME" = "github-pages" ]; then
+              echo "Skipping run ${RUN_ID} (${RUN_NAME})."
+              continue
+            fi
+            ARTIFACTS_JSON=$(curl --fail -s -L \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/rehlds/ReHLDS/actions/runs/${RUN_ID}/artifacts")
+            CANDIDATE_ARTIFACT_URL=$(echo "$ARTIFACTS_JSON" | jq -r '.artifacts[] | select(.name=="linux32") | .archive_download_url' | head -n 1)
+            if [ -n "$CANDIDATE_ARTIFACT_URL" ] && [ "$CANDIDATE_ARTIFACT_URL" != "null" ]; then
+              LATEST_RUN_ID="$RUN_ID"
+              REHLDS_COMMIT_SHA="$RUN_SHA"
+              ARTIFACT_URL="$CANDIDATE_ARTIFACT_URL"
+              break
+            fi
+          done < <(echo "$LATEST_RUN_INFO" | jq -c '.workflow_runs[]')
           if [ -z "$LATEST_RUN_ID" ] || [ "$LATEST_RUN_ID" == "null" ]; then
-            echo "Error: Could not find the latest successful workflow run for ReHLDS."
+            echo "Error: Could not find a suitable successful workflow run for ReHLDS."
             exit 1
           fi
           echo "sha=$REHLDS_COMMIT_SHA" >> $GITHUB_OUTPUT
-          ARTIFACTS_JSON=$(curl --fail -s -L \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/rehlds/ReHLDS/actions/runs/${LATEST_RUN_ID}/artifacts")
-          ARTIFACT_URL=$(echo "$ARTIFACTS_JSON" | jq -r '.artifacts[] | select(.name=="linux32").archive_download_url')
           if [ -z "$ARTIFACT_URL" ] || [ "$ARTIFACT_URL" == "null" ]; then
             echo "Error: Could not find 'linux32' artifact archive_download_url in run ${LATEST_RUN_ID}."
-            echo "$ARTIFACTS_JSON"
             exit 1
           fi
           echo "Downloading artifact..."
@@ -64,22 +79,37 @@ jobs:
           LATEST_RUN_INFO=$(curl --fail -s -L \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/rehlds/ReGameDLL_CS/actions/runs?branch=master&status=success&per_page=1")
-          LATEST_RUN_ID=$(echo "$LATEST_RUN_INFO" | jq -r '.workflow_runs[0].id')
-          REGAMEDLL_COMMIT_SHA=$(echo "$LATEST_RUN_INFO" | jq -r '.workflow_runs[0].head_sha')
+            "https://api.github.com/repos/rehlds/ReGameDLL_CS/actions/runs?branch=master&status=success&per_page=20")
+          LATEST_RUN_ID=""
+          REGAMEDLL_COMMIT_SHA=""
+          ARTIFACT_URL=""
+          while IFS= read -r run; do
+            RUN_ID=$(echo "$run" | jq -r '.id')
+            RUN_NAME=$(echo "$run" | jq -r '.name')
+            RUN_SHA=$(echo "$run" | jq -r '.head_sha')
+            if [ "$RUN_NAME" = "github-pages" ]; then
+              echo "Skipping run ${RUN_ID} (${RUN_NAME})."
+              continue
+            fi
+            ARTIFACTS_JSON=$(curl --fail -s -L \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/rehlds/ReGameDLL_CS/actions/runs/${RUN_ID}/artifacts")
+            CANDIDATE_ARTIFACT_URL=$(echo "$ARTIFACTS_JSON" | jq -r '.artifacts[] | select(.name=="linux32") | .archive_download_url' | head -n 1)
+            if [ -n "$CANDIDATE_ARTIFACT_URL" ] && [ "$CANDIDATE_ARTIFACT_URL" != "null" ]; then
+              LATEST_RUN_ID="$RUN_ID"
+              REGAMEDLL_COMMIT_SHA="$RUN_SHA"
+              ARTIFACT_URL="$CANDIDATE_ARTIFACT_URL"
+              break
+            fi
+          done < <(echo "$LATEST_RUN_INFO" | jq -c '.workflow_runs[]')
           if [ -z "$LATEST_RUN_ID" ] || [ "$LATEST_RUN_ID" == "null" ]; then
-            echo "Error: Could not find the latest successful workflow run for ReGameDLL_CS."
+            echo "Error: Could not find a suitable successful workflow run for ReGameDLL_CS."
             exit 1
           fi
           echo "sha=$REGAMEDLL_COMMIT_SHA" >> $GITHUB_OUTPUT
-          ARTIFACTS_JSON=$(curl --fail -s -L \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/rehlds/ReGameDLL_CS/actions/runs/${LATEST_RUN_ID}/artifacts")
-          ARTIFACT_URL=$(echo "$ARTIFACTS_JSON" | jq -r '.artifacts[] | select(.name=="linux32").archive_download_url')
           if [ -z "$ARTIFACT_URL" ] || [ "$ARTIFACT_URL" == "null" ]; then
             echo "Error: Could not find 'linux32' artifact archive_download_url in run ${LATEST_RUN_ID}."
-            echo "$ARTIFACTS_JSON"
             exit 1
           fi
           echo "Downloading artifact..."
@@ -112,22 +142,37 @@ jobs:
           LATEST_RUN_INFO=$(curl --fail -s -L \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/rehlds/ReAPI/actions/runs?branch=master&status=success&per_page=1")
-          LATEST_RUN_ID=$(echo "$LATEST_RUN_INFO" | jq -r '.workflow_runs[0].id')
-          REAPI_COMMIT_SHA=$(echo "$LATEST_RUN_INFO" | jq -r '.workflow_runs[0].head_sha')
+            "https://api.github.com/repos/rehlds/ReAPI/actions/runs?branch=master&status=success&per_page=20")
+          LATEST_RUN_ID=""
+          REAPI_COMMIT_SHA=""
+          ARTIFACT_URL=""
+          while IFS= read -r run; do
+            RUN_ID=$(echo "$run" | jq -r '.id')
+            RUN_NAME=$(echo "$run" | jq -r '.name')
+            RUN_SHA=$(echo "$run" | jq -r '.head_sha')
+            if [ "$RUN_NAME" = "github-pages" ]; then
+              echo "Skipping run ${RUN_ID} (${RUN_NAME})."
+              continue
+            fi
+            ARTIFACTS_JSON=$(curl --fail -s -L \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/rehlds/ReAPI/actions/runs/${RUN_ID}/artifacts")
+            CANDIDATE_ARTIFACT_URL=$(echo "$ARTIFACTS_JSON" | jq -r '.artifacts[] | select(.name=="linux32") | .archive_download_url' | head -n 1)
+            if [ -n "$CANDIDATE_ARTIFACT_URL" ] && [ "$CANDIDATE_ARTIFACT_URL" != "null" ]; then
+              LATEST_RUN_ID="$RUN_ID"
+              REAPI_COMMIT_SHA="$RUN_SHA"
+              ARTIFACT_URL="$CANDIDATE_ARTIFACT_URL"
+              break
+            fi
+          done < <(echo "$LATEST_RUN_INFO" | jq -c '.workflow_runs[]')
           if [ -z "$LATEST_RUN_ID" ] || [ "$LATEST_RUN_ID" == "null" ]; then
-            echo "Error: Could not find the latest successful workflow run for ReAPI."
+            echo "Error: Could not find a suitable successful workflow run for ReAPI."
             exit 1
           fi
           echo "sha=$REAPI_COMMIT_SHA" >> $GITHUB_OUTPUT
-          ARTIFACTS_JSON=$(curl --fail -s -L \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/rehlds/ReAPI/actions/runs/${LATEST_RUN_ID}/artifacts")
-          ARTIFACT_URL=$(echo "$ARTIFACTS_JSON" | jq -r '.artifacts[] | select(.name=="linux32").archive_download_url')
           if [ -z "$ARTIFACT_URL" ] || [ "$ARTIFACT_URL" == "null" ]; then
             echo "Error: Could not find 'linux32' artifact archive_download_url in run ${LATEST_RUN_ID}."
-            echo "$ARTIFACTS_JSON"
             exit 1
           fi
           echo "Downloading artifact..."
