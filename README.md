@@ -59,7 +59,7 @@ This base includes the following pre-installed modules and binaries:
 
 |    Module   |   Version  | Description |
 |:-----------:|:----------:|:------------|
-|    ReHLDS   |   f63f6e3| Reverse-engineered HLDS engine |
+|    ReHLDS   |   12f8f7a| Reverse-engineered HLDS engine |
 |  ReGameDLL  |   1f16a7f| Fixed and improved CS game logic |
 |  Metamod-R  | v1.3.0.149 | Metamod optimized for ReHLDS |
 |  AMXX v1.10 | build 5467 | Scripting platform for plugins |
